@@ -157,6 +157,33 @@ for (trn in trn.vector){
   
   # convert distance matrix to correlation matrix 
   mat3 <- cov(mat2,mat2, method = c("pearson")) 
+  
+  
+  ############### customized binning on correlations of co-occurrence
+  correlation <- cor(mat)
+  
+  ## write matrix into file under the directory of results.path
+  Mat.fname <- file.path(results.path, "clustering", paste0("correlationMat_trn",trn,"_W",ws,"(",gf1,",",gf2,")_",lenBLK.threshold/1000,"kbBLK.csv"))
+  write.csv(correlation, file=Mat.fname, row.names=FALSE)
+  
+
+  vec <- as.vector(correlation)
+  vec2 <- sort(vec, decreasing = FALSE)
+  
+  l <- length(vec2)
+  # print(l)
+  sm <- min(vec2)
+  lr <- max(vec2)
+  bins=c(sm,
+           nth(vec2,as.integer(l*0.5)),
+           nth(vec2,as.integer(l*0.65)),
+           nth(vec2,as.integer(l*0.75)),
+           nth(vec2,as.integer(l*0.81)),
+           nth(vec2,as.integer(l*0.85)),
+           nth(vec2,as.integer(l*0.89)),
+           nth(vec2,as.integer(l*0.93)),
+           nth(vec2,as.integer(l*0.995)), lr)
+  
      
   ############################################
   ########### generate heatmaps to group contigs into ancestral chromosomes
@@ -165,33 +192,47 @@ for (trn in trn.vector){
   ## convert distance to -log d
   d3 <- -log(mat2); diag(d3) <- 0
   
-  ## set data to be distance or correlation based matrix
-  data <- mat3
+  # ## set data to be distance or correlation based matrix
+  # data <- mat3
+  # 
+  # # different brewer.pal themes: Reds, Greens, Blues
+  # pdf(file=file.path(results.path, "clustering", paste0("AncestorNode_",trn,"_heat.pdf")), width=40, height=40)
+  # par(cex.main=4)
+  # p <- heatmap.2(data,
+  #                main = paste0("Ancestor ",trn),
+  #                dendrogram="row",     # only draw a row dendrogram
+  #                hclustfun = hclust, ## defaut method for hclust: "complete"
+  #                srtCol=0,   adjCol = c(0.5,1), #breaks=c(min(data), 0.1, 0.15, 0.2, 0.225,0.25,0.275,0.29,0.3,max(data)),#breaks=c(min(data), 0.05, 0.075, 0.1, 0.15,0.2,0.3,0.4,0.5,max(data)), ## breaks for distance based matrices
+  #                 breaks=c(min(data),0.0005,0.001,0.0015,0.002,0.0025,0.003,0.0035,0.004,max(data)),# breaks for ancestor 1 correlation based matrices
+  #                #breaks=c(min(data),0.001,0.0015,0.002,0.0025,0.003,0.0035,0.004,0.006,max(data)),# breaks for ancestor 4 correlation based matrices
+  #                lhei=c(.1,1), lwid=c(.2,1), key.title="Color Key", keysize=0.75,
+  #                col = brewer.pal(9, "Blues"), trace = "none")
+  # 
+  # # generate small size heatmaps without title and ledgend
+  # png(file=file.path(results.path, "clustering", paste0("AncestorNode_",trn,"_heat_small.png")), width = 480, height = 480, units = "px")
+  # p <- heatmap.2(data,
+  #                dendrogram="none",
+  #                hclustfun = hclust,
+  #                srtCol=0,   adjCol = c(0.5,1),
+  #                breaks=c(min(data),0.0005,0.001,0.0015,0.002,0.0025,0.003,0.0035,0.004,max(data)),
+  #                lhei=c(.1,1), lwid=c(.1,1),
+  #                labCol=FALSE, labRow=FALSE,
+  #                col = brewer.pal(9, "Blues"), trace = "none")
   
   
-  # different brewer.pal themes: Reds, Greens, Blues
-  pdf(file=file.path(results.path, "clustering", paste0("AncestorNode_",trn,"_heat.pdf")), width=40, height=40)
+  
+  pdf(correlation, file=file.path(results.path, "clustering", paste0("AncestorNode_",trn,"_heat.pdf")), width=40, height=40)
   par(cex.main=4)
-  p <- heatmap.2(data,
+  p <- heatmap.2(correlation,
                  main = paste0("Ancestor ",trn),
-                 dendrogram="row",     # only draw a row dendrogram
-                 hclustfun = hclust, ## defaut method for hclust: "complete"
-                 srtCol=0,   adjCol = c(0.5,1), #breaks=c(min(data), 0.1, 0.15, 0.2, 0.225,0.25,0.275,0.29,0.3,max(data)),#breaks=c(min(data), 0.05, 0.075, 0.1, 0.15,0.2,0.3,0.4,0.5,max(data)), ## breaks for distance based matrices
-                  breaks=c(min(data),0.0005,0.001,0.0015,0.002,0.0025,0.003,0.0035,0.004,max(data)),# breaks for ancestor 1 correlation based matrices
-                 #breaks=c(min(data),0.001,0.0015,0.002,0.0025,0.003,0.0035,0.004,0.006,max(data)),# breaks for ancestor 4 correlation based matrices
-                 lhei=c(.1,1), lwid=c(.2,1), key.title="Color Key", keysize=0.75,
-                 col = brewer.pal(9, "Blues"), trace = "none")
-  
-  # generate small size heatmaps without title and ledgend
-  png(file=file.path(results.path, "clustering", paste0("AncestorNode_",trn,"_heat_small.png")), width = 480, height = 480, units = "px")
-  p <- heatmap.2(data,
-                 dendrogram="none",
-                 hclustfun = hclust,
+                 dendrogram="row",     # only draw a row dendrogram/ none
+                 hclustfun=hclust,
                  srtCol=0,   adjCol = c(0.5,1),
-                 breaks=c(min(data),0.0005,0.001,0.0015,0.002,0.0025,0.003,0.0035,0.004,max(data)),
-                 lhei=c(.1,1), lwid=c(.1,1),
-                 labCol=FALSE, labRow=FALSE,
-                 col = brewer.pal(9, "Blues"), trace = "none")
+                 lhei=c(.1,1), lwid=c(.2,1), key.title="Color Key", keysize=0.75,
+                 col = brewer.pal(9, "Greys"), breaks = bins,
+                 trace = "none")
+  
+
   
   print(p)
   dev.off()
