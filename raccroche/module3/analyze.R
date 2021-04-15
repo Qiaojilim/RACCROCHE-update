@@ -51,11 +51,7 @@ for (trn in trn.vector){
     
     # add a column lenBLK: length of block
     blockDF <- setDT(blockDF)[, lenBLK := end - start]
-    
-    # stats.DF <- data.frame( ws=numeric(), treeNode=numeric(), gf1=numeric(), gf2=numeric(), 
-    #                         gID=numeric(), gName=character(), avgBLKLen=numeric(), BLKLen.N50=numeric(), coverage=numeric(),
-    #                         avgNoChr=numeric(), stringsAsFactors = FALSE)
-    # 
+
     ############################################
     ### calculate block measures: 
     ### average block length in bp
