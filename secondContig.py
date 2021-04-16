@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-
+import pandas as pd
 
 #### new second contigs set constructing
 #read genomes data
@@ -25,7 +25,7 @@ for idx, line in enumerate(genomes):
 
 adjs = []
 adjs_copy = []
-for t in open(r'./secondContig/old/W7InputTreeNode2_50_10'
+for t in open(r'./secondContig/1stOld/W7InputTreeNode3_50_10'
               '.txt').read().split("),"):
     a, b, c = t.strip('()').split(',')
     if int(c) > 0:
@@ -34,7 +34,7 @@ for t in open(r'./secondContig/old/W7InputTreeNode2_50_10'
 
 
 #adj after mwm
-mwm = open(r"./secondContig/old/W7TreeNode2_50_10.txt", 'r')
+mwm = open(r"./secondContig/1stOld/W7TreeNode3_50_10.txt", 'r')
 mwm = mwm.readlines()
 for l in range(0, len(mwm)):
     mwm[l] = tuple(int(item) for item in mwm[l].split())
@@ -112,7 +112,38 @@ for i in range(0, len(idxs)):
 dupsAdj = set(dupsAdj) #remove copies
 dupsAdj2 = list(dupsAdj.intersection(mwm)) ##get all duplicated adjs in mwm
 
-   
+dupsAdj2 = list(dupsAdj.intersection(mwm)) ##get all duplicated adjs in mwm
+
+geneDup = []
+for num in dupsAdj2:
+    if num[0] %2 == 0:
+        geneDup.append(int(num[0]/2 +1))
+    else:
+        geneDup.append(int((num[0]+1)/2))
+        
+    if num[1] %2 == 0:
+        geneDup.append(int(num[1]/2 +1))
+    else:
+        geneDup.append(int((num[1]+1)/2))
+            
+geneDup = sorted(set(geneDup))       
+#pd.DataFrame(sorted(geneDup)).to_csv('geneDup.txt', header=None, index=False)
+gfs = pd.read_csv(r"./secondContig/1stOld/CleanedGF.csv", header=None)   
+for g in geneDup:
+    # g = 10
+    # gfs2 = copy.deepcopy(gfs)
+    # gfs.loc[(gfs[1] == g) & (gfs[8] == 25734), 2] = 26
+    # gfs.loc[(gfs[1] == g) & (gfs[8] == 33018), 2] = 17
+    # gfs.loc[(gfs[1] == g) & (gfs[8] == 33908), 2] = 11
+    # gfs.loc[(gfs[1] == g) & (gfs[8] == 51051), 2] = 22
+    # gfs.loc[(gfs[1] == g) & (gfs[8] == 51364), 2] = 21
+    # gfs.loc[(gfs[1] == g) & (gfs[8] == 54711), 2] = 13
+    gfs = gfs[gfs[1] != g]
+    # gfdata = gfs[gfs[1] == g].reset_index(drop=True)
+    # gfdata.loc[gfdata[8]==25734, 2] = 26
+    
+    
+gfs.to_csv(r"./secondContig/contigs2nd/CleanedGFanc3.csv", header=None, index=False)           
 
 ##get all candidate adjacencies for the second run
 adjsAll = set(sorted(adj2+dupsAdj2))
@@ -124,7 +155,7 @@ adjsAll = set(sorted(adj2+dupsAdj2))
 
 
 
-with open (r'./secondContig/W7InputTreeNode2_50_10.txt', 'w') as f:
+with open (r'./secondContig/W7InputTreeNode3_50_10.txt', 'w') as f:
     print("maxWeightMatching([", file=f)
     for j in adjsAll:
         print("("+str(j[0])+", "+str(j[1])+", "+str(j[2])+"),", end='', file=f)
@@ -137,25 +168,25 @@ with open (r'./secondContig/W7InputTreeNode2_50_10.txt', 'w') as f:
 path = os.path.abspath(os.getcwd())
 
 fin = open (r'./secondContig/Sample_MWM_Output.py',"rt")
-fout = open (r'./secondContig/mwmInputW7_50_10_TreeNode2.py',"wt")
+fout = open (r'./secondContig/mwmInputW7_50_10_TreeNode3.py',"wt")
 for line in fin:
-    fout.write(line.replace('/Users/qiaojixu/Desktop/6Genomes_Project/TreeNode/MWMOutput/S4.txt',path+'/secondContig/MWMOutput/W7TreeNode2_50_10.txt'))
+    fout.write(line.replace('/Users/qiaojixu/Desktop/6Genomes_Project/TreeNode/MWMOutput/S4.txt',path+'/secondContig/2ndMWM/W7TreeNode3_50_10.txt'))
 
 fin.close()
 fout.close()
 
-with open (r'./secondContig//W7InputTreeNode2_50_10.txt') as f:
-    with open (r'./secondContig/mwmInputW7_50_10_TreeNode2.py','a') as f1:
+with open (r'./secondContig//W7InputTreeNode3_50_10.txt') as f:
+    with open (r'./secondContig/mwmInputW7_50_10_TreeNode3.py','a') as f1:
         for line in f:
             f1.write(line)
         print('end = time.perf_counter()'+'\n'+'print (end - start)',file =f1)
    
 
-exec(open(r'./secondContig/mwmInputW7_50_10_TreeNode2.py').read())   
+exec(open(r'./secondContig/mwmInputW7_50_10_TreeNode3.py').read())
 
 path2 = os.path.join(path, "secondContig")
 ##get second contig file
-os.system('java -jar GetContig.jar ' + path2 + ' W7TreeNode2_50_10.txt')
+os.system('java -jar GetContig.jar ' + path2 + ' W7TreeNode3_50_10.txt')
 
 
         
