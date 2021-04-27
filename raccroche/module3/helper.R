@@ -1,3 +1,25 @@
+##### read in duplicated genes matrix to be analyzed
+readIn.dupContig <- function(ws, trn, gf1, gf2, Nctg, contig.path){
+  dupContig.fname <- paste0("W",ws,"TreeNode",trn,"_",gf1,"_",gf2,"dupMatrix.txt")
+  #print(dupContig.fname)
+
+  #matrixDup <- read.delim(file.path(data.path, fname), header=TRUE)
+  matrixDup <- as.matrix(read.table(file.path(contig.path, dupContig.fname),
+                                   sep="," , header=TRUE))
+                      
+  rownames(matrixDup) <- seq.int(0, Nctg-1)
+  colnames(matrixDup) <- seq.int(0, Nctg-1)
+  
+  
+  return(matrixDup)
+  
+}
+
+
+
+
+
+
 ##### read in ancestral genome
 readIn.ancestorGF <- function(contig.path, ws, trn, gf1, gf2, clusterVector)
 {
