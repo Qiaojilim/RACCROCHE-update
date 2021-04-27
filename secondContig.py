@@ -55,7 +55,7 @@ for tr in nodes:
     gf1=50
     gf2=10
     TreeNode ='TreeNode'+treenode          
-    """
+    
     #adj before mwm:
     
     # adjs = []
@@ -263,7 +263,7 @@ for tr in nodes:
     ##get second contig file
     os.system('java -jar GetContig.jar ' + path2 + ' W'+str(WS)+TreeNode+'_50_10.txt')
     
-    """
+    
     geneDup = pd.read_csv(r'./secondContig/contigs2nd/dupGenes/W7TreeNode'+treenode+'geneDup.txt', header=None)
     geneDup=list(geneDup[0])
     ###########
