@@ -2,15 +2,10 @@ source("./module3/utilities.R")
 source("./module3/helper.R")
 
 #### Install reqired packages in R Console
-packages<-c("parallel", "MASS", "yaml","gplots", "ggplot2", "dplyr", "scales", "grid", "gridExtra", "data.table", "RColorBrewer", "varhandle", "cowplot", "plyr", "spaa","CRPClustering", "taRifx")
+packages<-c("yaml","gplots", "ggplot2", "dplyr", "scales", "grid", "gridExtra", "data.table", "RColorBrewer", "varhandle", "cowplot", "plyr", "spaa","CRPClustering", "taRifx", "reticulate")
 cat("\n\n*********Checking Dependencies *********\n\n")
 check.packages(packages)
 cat("*********Finished checking dependencies*********\n\n\n\n")
-
-
-## detect number of cores for parallel computing
-numCores <- detectCores()
-
 
 current_wd <- getwd() ## run Rscript in command line
 # current_wd <- dirname(rstudioapi::getSourceEditorContext()$path) ## run Rscript in RStudio
@@ -26,17 +21,14 @@ gf2 <- config.obj$gf2  # gene family size para2: the maximum number of genomes i
 
 K <- config.obj$K  # desired number of ancestral chromosomes
 
+numC <- config.obj$numC #number of clusters
 ############################################################
 ################## check input directories ####################
 
-
 ## input: read in CoGeIDs for all genomes
 genomeCoGeID <- readIn.genomes (config.obj$data.path, "Genomes.txt")
-
 ## tree nodes to analyze
-trn.vector <- seq(min(genomeCoGeID$ancestor), max(genomeCoGeID$ancestor)) 
-# trn.vector <- sort(unique(genomeCoGeID$ancestor)) 
-
+trn.vector <- sort(unique(genomeCoGeID$ancestor)) 
 ## genomes to analyze
 gid.vector <- genomeCoGeID$genomeID
 
@@ -49,18 +41,24 @@ contig.path <- file.path(config.obj$data.path, "data", "Contig")
 ## input: path to labelled gene families 
 GF.path <- file.path(config.obj$data.path, "data", "GeneFamily")
 
+## input: read all duplicated genes in  first mwm output
+
+##input iteration numbers
+iteration.vector <- c(1,2,3,4,5,6,7,8,9,10)
+
+
 
 ############################################################
 ################## check output directories ####################
 
 ## path to contig GFF files (output of getContigGenes.R)
-contigGFF.path <- file.path(config.obj$data.path, "data", "contigGFF")
+contigGFF.path <- file.path(config.obj$data.path, "data", "ContigGFF")
 
 ## path to results
 results.path <- file.path(config.obj$data.path,"results")
 
 ## create output directories if they don't exist
-dir.create(file.path(config.obj$data.path, "data", "contigGFF"), showWarnings = FALSE)
+dir.create(file.path(config.obj$data.path, "data", "ContigGFF"), showWarnings = FALSE)
 dir.create(file.path(config.obj$data.path,"results"), showWarnings = FALSE)
 
 dir.create(file.path(results.path, "ancestorStats"), showWarnings = FALSE)

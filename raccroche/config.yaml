@@ -18,7 +18,8 @@ gf2:
 # specify the desired number of ancestral chromosomes
 K: 7  
 
-
+# number of clusters in each ancestor
+numC: 8
 ## set thresholds
 ctgLen: 1   ## minimum length in each contig
 nctg: 250    ## only include first nctg contigs
